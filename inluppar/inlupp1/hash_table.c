@@ -7,7 +7,6 @@
 #define No_Buckets 17
 
 typedef struct hash_table ioopm_hash_table_t;
-
 typedef struct entry entry_t;
 
 struct entry
@@ -24,8 +23,22 @@ struct hash_table
   entry_t buckets[No_Buckets];
 };
 
+static int bucket_size(entry_t *entry)
+{
+  int size = 0;
+
+  while (entry != NULL)
+  {
+    size++;
+    entry = entry->next;
+  }
+
+  return size;
+}
+
 static entry_t *entry_create(char *key, int value, entry_t *next);
 entry_t *find_previous_entry(ioopm_hash_table_t *ht, char *key);
+void entry_destroy(entry_t *entry);
 
 static size_t string_to_hash(const char *str)
 {
@@ -128,6 +141,42 @@ static entry_t *entry_create(char *key, int value, entry_t *next)
   item->next = next;
 
   return item;
+}
+
+// TODO: documentation
+bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, char *key) {
+
+  entry_t *previous = find_previous_entry(ht, key);
+
+  if (previous->next != NULL) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+// TODO: documentation
+int ioopm_hash_table_size(ioopm_hash_table_t *ht) {
+
+  int size = 0;
+
+  for (int i = 0; i < No_Buckets; i++) {
+  size += bucket_size(ht->buckets[i].next);
+  }
+
+  return size;
+}
+
+// TODO: documentation
+bool ioopm_hash_table_is_empty(ioopm_hash_table_t *ht) {
+
+  int size = ioopm_hash_table_size(ht);
+
+  if (size == 0) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 void entry_destroy(entry_t *entry) {
