@@ -1,11 +1,12 @@
 #include <stdlib.h>
 #include "hash_table_struct.h"
+#include "common.h"
 typedef struct hash_table_iterator ioopm_hash_table_iterator_t;
 
 struct hash_table_iterator
 {
     ioopm_hash_table_t *ht;
-    int current_bucket;
+    size_t current_bucket;
     entry_t *current_entry;
 };
 
@@ -15,8 +16,8 @@ void iterator_state_advance(ioopm_hash_table_iterator_t *hti);
 void ioopm_hash_table_iterator_advance(ioopm_hash_table_iterator_t *it);
 static void skip_sentinel_nodes(ioopm_hash_table_iterator_t *hti);
 void ioopm_hash_table_iterator_advance(ioopm_hash_table_iterator_t *it);
-char *ioopm_hash_table_iterator_current_key(ioopm_hash_table_iterator_t *it);
-int ioopm_hash_table_iterator_current_value(ioopm_hash_table_iterator_t *it);
+elem_t ioopm_hash_table_iterator_current_key(ioopm_hash_table_iterator_t *it);
+elem_t ioopm_hash_table_iterator_current_value(ioopm_hash_table_iterator_t *it);
 bool ioopm_hash_table_iterator_at_end(ioopm_hash_table_iterator_t *hti);
 
 ioopm_hash_table_iterator_t *ioopm_hash_table_iterator_create(ioopm_hash_table_t *ht)
@@ -59,12 +60,12 @@ void ioopm_hash_table_iterator_advance(ioopm_hash_table_iterator_t *it) {
     skip_sentinel_nodes(it);
 }
 
-char *ioopm_hash_table_iterator_current_key(ioopm_hash_table_iterator_t *it) {
+elem_t ioopm_hash_table_iterator_current_key(ioopm_hash_table_iterator_t *it) {
 
     return it->current_entry->key;
 }
 
-int ioopm_hash_table_iterator_current_value(ioopm_hash_table_iterator_t *it) {
+elem_t ioopm_hash_table_iterator_current_value(ioopm_hash_table_iterator_t *it) {
 
     return it->current_entry->value;
 }

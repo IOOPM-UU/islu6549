@@ -1,0 +1,110 @@
+        -:    0:Source:hash_table_iterator.c
+        -:    0:Graph:unit_tests-hash_table_iterator.gcno
+        -:    0:Data:unit_tests-hash_table_iterator.gcda
+        -:    0:Runs:1
+        -:    1:#include <stdlib.h>
+        -:    2:#include "hash_table_struct.h"
+        -:    3:#include "common.h"
+        -:    4:typedef struct hash_table_iterator ioopm_hash_table_iterator_t;
+        -:    5:
+        -:    6:struct hash_table_iterator
+        -:    7:{
+        -:    8:    ioopm_hash_table_t *ht;
+        -:    9:    size_t current_bucket;
+        -:   10:    entry_t *current_entry;
+        -:   11:};
+        -:   12:
+        -:   13:ioopm_hash_table_iterator_t *ioopm_hash_table_iterator_create(ioopm_hash_table_t *ht);
+        -:   14:void ioopm_hash_table_iterator_destroy(ioopm_hash_table_iterator_t *hti);
+        -:   15:void iterator_state_advance(ioopm_hash_table_iterator_t *hti);
+        -:   16:void ioopm_hash_table_iterator_advance(ioopm_hash_table_iterator_t *it);
+        -:   17:static void skip_sentinel_nodes(ioopm_hash_table_iterator_t *hti);
+        -:   18:void ioopm_hash_table_iterator_advance(ioopm_hash_table_iterator_t *it);
+        -:   19:elem_t ioopm_hash_table_iterator_current_key(ioopm_hash_table_iterator_t *it);
+        -:   20:elem_t ioopm_hash_table_iterator_current_value(ioopm_hash_table_iterator_t *it);
+        -:   21:bool ioopm_hash_table_iterator_at_end(ioopm_hash_table_iterator_t *hti);
+        -:   22:
+function ioopm_hash_table_iterator_create called 4 returned 100% blocks executed 100%
+        4:   23:ioopm_hash_table_iterator_t *ioopm_hash_table_iterator_create(ioopm_hash_table_t *ht)
+        -:   24:{
+        4:   25:    ioopm_hash_table_iterator_t *hti = malloc(sizeof(ioopm_hash_table_iterator_t));
+        -:   26:
+        4:   27:    hti->ht = ht;
+        4:   28:    hti->current_bucket = 0;
+        4:   29:    hti->current_entry = &ht->buckets[0];
+        -:   30:
+        4:   31:    skip_sentinel_nodes(hti);
+call    0 returned 100%
+        -:   32:
+        4:   33:    return hti;
+        -:   34:}
+        -:   35:
+function ioopm_hash_table_iterator_destroy called 4 returned 100% blocks executed 100%
+        4:   36:void ioopm_hash_table_iterator_destroy(ioopm_hash_table_iterator_t *hti) {
+        -:   37:
+        4:   38:    free(hti);
+        4:   39:}
+        -:   40:
+function iterator_state_advance called 71 returned 100% blocks executed 100%
+       71:   41:void iterator_state_advance(ioopm_hash_table_iterator_t *hti)
+        -:   42:{
+        -:   43:    // advance to the next entry in the bucket
+       71:   44:    hti->current_entry = hti->current_entry->next;
+        -:   45:    // if it was null advance to the next bucket
+       71:   46:    if (hti->current_entry == NULL) {
+branch  0 taken 90% (fallthrough)
+branch  1 taken 10%
+       64:   47:        hti->current_bucket += 1;
+        -:   48:        // if the next bucket existed, update the current entry
+       64:   49:        if (hti->current_bucket != No_Buckets) {
+branch  0 taken 95% (fallthrough)
+branch  1 taken 5%
+       61:   50:            hti->current_entry = &hti->ht->buckets[hti->current_bucket];
+        -:   51:        }
+        -:   52:    }
+        -:   53:
+       71:   54:    skip_sentinel_nodes(hti);
+call    0 returned 100%
+       71:   55:}
+        -:   56:
+function ioopm_hash_table_iterator_advance called 6 returned 100% blocks executed 100%
+        6:   57:void ioopm_hash_table_iterator_advance(ioopm_hash_table_iterator_t *it) {
+        -:   58:
+        6:   59:    iterator_state_advance(it);
+call    0 returned 100%
+        6:   60:    skip_sentinel_nodes(it);
+call    0 returned 100%
+        6:   61:}
+        -:   62:
+function ioopm_hash_table_iterator_current_key called 4 returned 100% blocks executed 100%
+        4:   63:elem_t ioopm_hash_table_iterator_current_key(ioopm_hash_table_iterator_t *it) {
+        -:   64:
+        4:   65:    return it->current_entry->key;
+        -:   66:}
+        -:   67:
+function ioopm_hash_table_iterator_current_value called 4 returned 100% blocks executed 100%
+        4:   68:elem_t ioopm_hash_table_iterator_current_value(ioopm_hash_table_iterator_t *it) {
+        -:   69:
+        4:   70:    return it->current_entry->value;
+        -:   71:}
+        -:   72:
+function skip_sentinel_nodes called 81 returned 100% blocks executed 100%
+       81:   73:static void skip_sentinel_nodes(ioopm_hash_table_iterator_t *hti) {
+        -:   74:
+      146:   75:    while (hti->current_bucket != No_Buckets &&     
+branch  0 taken 85% (fallthrough)
+branch  1 taken 15%
+      124:   76:           hti->current_entry == &hti->ht->buckets[hti->current_bucket]) {
+branch  0 taken 52%
+branch  1 taken 48% (fallthrough)
+        -:   77:
+       65:   78:        iterator_state_advance(hti);
+call    0 returned 100%
+        -:   79:    }
+       81:   80:}
+        -:   81:
+function ioopm_hash_table_iterator_at_end called 10 returned 100% blocks executed 100%
+       10:   82:bool ioopm_hash_table_iterator_at_end(ioopm_hash_table_iterator_t *hti) {
+        -:   83:
+       10:   84:    return hti->current_bucket == No_Buckets;
+        -:   85:}

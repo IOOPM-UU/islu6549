@@ -1,0 +1,81 @@
+        -:    0:Source:linked_list_iterator.c
+        -:    0:Graph:unit_tests-linked_list_iterator.gcno
+        -:    0:Data:unit_tests-linked_list_iterator.gcda
+        -:    0:Runs:1
+        -:    1:#include <stdlib.h>
+        -:    2:#include <string.h>
+        -:    3:#include <stdbool.h>
+        -:    4:#include "linked_list.h"
+        -:    5:#include "linked_list_struct.h"
+        -:    6:
+        -:    7:typedef struct list_iterator ioopm_list_iterator_t;
+        -:    8:
+        -:    9:struct list_iterator
+        -:   10:{
+        -:   11:    ioopm_list_t *list;
+        -:   12:    node_t *current_entry;
+        -:   13:};
+        -:   14:
+        -:   15:/// @brief Create a new iterator
+        -:   16:/// @param l the list to iterate over
+function ioopm_list_iterator_create called 4 returned 100% blocks executed 100%
+        4:   17:ioopm_list_iterator_t *ioopm_list_iterator_create(ioopm_list_t *l) {
+        4:   18:    ioopm_list_iterator_t *li = malloc(sizeof(ioopm_list_iterator_t));
+        -:   19:
+        4:   20:    li->list = l;
+        4:   21:    li->current_entry = l->head;
+        -:   22:
+        4:   23:    return li;
+        -:   24:}
+        -:   25:
+        -:   26:/// @brief Destroy the iterator and return its resources
+        -:   27:/// @param iter the iterator
+function ioopm_list_iterator_destroy called 4 returned 100% blocks executed 100%
+        4:   28:void ioopm_list_iterator_destroy(ioopm_list_iterator_t *iter) {
+        4:   29:    free(iter);
+        4:   30:}
+        -:   31:
+        -:   32:/// @brief Checks if the iterator is positioned at-the-end
+        -:   33:/// @param iter the iterator
+        -:   34:/// @return true if iter is positioned at-the-end
+function ioopm_list_iterator_at_end called 2 returned 100% blocks executed 100%
+        2:   35:bool ioopm_list_iterator_at_end(ioopm_list_iterator_t *iter) {
+        2:   36:    if (iter->current_entry == NULL) {
+branch  0 taken 50% (fallthrough)
+branch  1 taken 50%
+        1:   37:        return true;
+        -:   38:    } else {
+        1:   39:        return false;
+        -:   40:    }
+        -:   41:}
+        -:   42:
+        -:   43:/// @brief Step the iterator forward one step
+        -:   44:/// @param iter the iterator
+function ioopm_list_iterator_advance called 1 returned 100% blocks executed 100%
+        1:   45:void ioopm_list_iterator_advance(ioopm_list_iterator_t *iter) {
+        1:   46:    if (iter->current_entry != NULL) {
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        1:   47:        iter->current_entry = iter->current_entry->next;
+        -:   48:    } 
+        1:   49:}
+        -:   50:
+        -:   51:/// @brief Return the current element from the underlying list
+        -:   52:/// @param iter the iterator
+        -:   53:/// @return the current element
+function ioopm_list_iterator_current called 3 returned 100% blocks executed 100%
+        3:   54:elem_t ioopm_list_iterator_current(ioopm_list_iterator_t *iter) {
+        3:   55:    return iter->current_entry->value;
+        -:   56:}
+        -:   57:
+        -:   58:/// NOTE: REMOVE IS OPTIONAL TO IMPLEMENT
+        -:   59:/// @brief Remove the current element from the underlying list
+        -:   60:/// @param iter the iterator
+        -:   61:/// @return the removed element
+        -:   62:elem_t ioopm_list_iterator_remove(ioopm_list_iterator_t *iter);
+        -:   63:
+        -:   64:/// NOTE: INSERT IS OPTIONAL TO IMPLEMENT
+        -:   65:/// @brief Insert a new element into the underlying list making the current element it's next
+        -:   66:/// @param iter the iterator
+        -:   67:/// @param element the element to be inserted
+        -:   68:void ioopm_list_iterator_insert(ioopm_list_iterator_t *iter, int element);
