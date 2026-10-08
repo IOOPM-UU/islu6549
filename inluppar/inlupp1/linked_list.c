@@ -187,6 +187,8 @@ elem_t ioopm_list_get(ioopm_list_t *list, size_t index) {
     return current_value->value;
 }
 
+/*
+// recursive version
 static elem_t list_get_tail_recursive(node_t *node, size_t index)
 {
     if (index == 0)
@@ -201,6 +203,7 @@ elem_t ioopm_list_get_tail_recursive(ioopm_list_t *list, size_t index)
 {
     return list_get_tail_recursive(list->head, index);
 }
+*/
 
 /// @brief Lookup the number of elements in the linked list in O(1) time
 /// @param list the linked list
