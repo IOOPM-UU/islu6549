@@ -3,13 +3,13 @@ CFLAGS = -Wall -g
 CUNIT = -lcunit
 
 unit_tests: unit_tests.c hash_table.c hash_table_iterator.c linked_list.c
-	$(CC) $(CFLAGS) $(CUNIT_INCLUDE) unit_tests.c hash_table.c hash_table_iterator.c linked_list.c list_iterator.c hash_functions.c $(CUNIT_LIB) $(CUNIT) -o unit_tests
+	$(CC) $(CFLAGS) $(CUNIT_INCLUDE) unit_tests.c hash_table.c hash_table_iterator.c linked_list.c linked_list_iterator.c $(CUNIT_LIB) $(CUNIT) -o unit_tests
 
 test: unit_tests
 	./unit_tests
 
 freq: freq-count
-	gcc -Wall -g freq_count.c hash_table.c hash_table_iterator.c linked_list.c list_iterator.c -o freq-count
+	gcc -Wall -g freq_count.c hash_table.c hash_table_iterator.c linked_list.c linked_list_iterator.c -o freq-count
 	./freq-count test.txt
 
 valgrindtest: unit_tests

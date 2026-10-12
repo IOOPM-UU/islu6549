@@ -1,9 +1,7 @@
-#pragma once
 #ifndef HASH_TABLE
 #define HASH_TABLE
 #include <stdbool.h>
 #include "common.h"
-#include "hash_table_struct.h"
 /**
 * @file hash_table.h
 * @author Isak Lundback Öst, Olivia Emilsson

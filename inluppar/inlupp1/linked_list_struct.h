@@ -1,3 +1,8 @@
+#pragma once
+
+#include <stddef.h>
+#include "common.h"
+
 typedef struct node node_t;
 
 struct node {

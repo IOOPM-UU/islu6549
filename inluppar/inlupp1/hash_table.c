@@ -61,7 +61,7 @@ ioopm_hash_table_t *ioopm_hash_table_create(
 /// @brief Delete a hash table and free its memory
 /// @param ht a hash table to be deleted
 void ioopm_hash_table_destroy(ioopm_hash_table_t *ht){
-  for(int i = 0; i < No_Buckets; i++) {
+  for(int i = 0; i < NO_BUCKETS; i++) {
     entry_t *previous = &ht->buckets[i];
     entry_t *current = previous->next;
     while (current != NULL)
@@ -110,7 +110,7 @@ elem_t ioopm_hash_table_lookup(ioopm_hash_table_t *ht, elem_t key) {
 }
 
 entry_t *find_previous_entry(ioopm_hash_table_t *ht, elem_t key) {
-  size_t bucket = ht->hash_fn(key) % No_Buckets;
+  size_t bucket = ht->hash_fn(key) % NO_BUCKETS;
 
   entry_t *previous = &ht->buckets[bucket];
   entry_t *current = previous->next;
@@ -153,7 +153,7 @@ size_t ioopm_hash_table_size(ioopm_hash_table_t *ht) {
 
   int size = 0;
 
-  for (int i = 0; i < No_Buckets; i++) {
+  for (int i = 0; i < NO_BUCKETS; i++) {
   size += bucket_size(ht->buckets[i].next);
   }
 
@@ -193,9 +193,7 @@ elem_t ioopm_hash_table_remove(ioopm_hash_table_t *ht, elem_t key){
     return old_current_next_value;
 
   } else {
-
-    printf("key not found");
-
+    // returns 0 if key not found
     return int_elem(0);
   }
 }

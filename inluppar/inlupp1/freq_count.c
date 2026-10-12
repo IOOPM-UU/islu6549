@@ -6,7 +6,7 @@
 
 #define BUFFER_SIZE 100
 
-void process_word(ioopm_hash_table_t *ht, char *word)
+static void process_word(ioopm_hash_table_t *ht, char *word)
 {
     elem_t result = ioopm_hash_table_lookup(ht, string_elem(word));
 
@@ -21,7 +21,7 @@ void process_word(ioopm_hash_table_t *ht, char *word)
     }
 }
 
-void process_file(char *filename, ioopm_hash_table_t *ht)
+static void process_file(char *filename, ioopm_hash_table_t *ht)
 {
     FILE *f = fopen(filename, "r");
 

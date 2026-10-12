@@ -10,22 +10,11 @@
 #include "linked_list.h"
 #include "list_iterator.h"
 
-size_t string_hash(elem_t key)
+// function to guarantee same bucket for tests
+static size_t constant_hash(elem_t key)
 {
-    size_t result = 0;
-
-    while (*key.s != '\0')
-    {
-        result = result * 31 + (unsigned char)*key.s;
-        key.s++;
-    }
-
-    return result;
-}
-
-bool string_eq(elem_t a, elem_t b)
-{
-    return strcmp(a.s, b.s) == 0;
+  (void) key;
+  return 0;
 }
 
 int init_suite(void) {
@@ -43,15 +32,14 @@ int clean_suite(void) {
 // These are example test functions. You should replace them with
 // functions of your own.
 void test_create_destroy() {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_hash, ioopm_string_eq);
   CU_ASSERT_PTR_NOT_NULL(ht);
   ioopm_hash_table_destroy(ht);
 }
 
-
 void test_ioopm_hash_table_create() {
 
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_hash, ioopm_string_eq);
   CU_ASSERT_PTR_NOT_NULL(ht);
   ioopm_hash_table_destroy(ht);
 }
@@ -59,7 +47,7 @@ void test_ioopm_hash_table_create() {
 void test_insert_once() {
 
   // create new hash table
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_hash, ioopm_string_eq);
 
   elem_t key = string_elem("abc");
   elem_t value = int_elem(123);
@@ -81,7 +69,7 @@ void test_insert_once() {
 void test_insert_twice() {
 
   // create new hash table
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_hash, ioopm_string_eq);
 
   elem_t key = string_elem("abc");
   elem_t value = int_elem(123);
@@ -106,9 +94,39 @@ void test_insert_twice() {
   ioopm_hash_table_destroy(ht);
 }
 
+void test_hash_collision() {
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(constant_hash, ioopm_string_eq);
+  
+  ioopm_hash_table_insert(ht, string_elem("first"), int_elem(123));
+  ioopm_hash_table_insert(ht, string_elem("second"), int_elem(124));
+
+  elem_t result = ioopm_hash_table_lookup(ht, string_elem("second"));
+
+  CU_ASSERT_EQUAL(result.i, 124);
+
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_is_empty() {
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_hash, ioopm_string_eq);
+
+  CU_ASSERT_TRUE(ioopm_hash_table_is_empty(ht));
+
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_is_not_empty() {
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_hash, ioopm_string_eq);
+
+  ioopm_hash_table_insert(ht, string_elem("string"), int_elem(123));
+
+  CU_ASSERT_FALSE(ioopm_hash_table_is_empty(ht));
+
+  ioopm_hash_table_destroy(ht);
+}
 
 void test_remove() {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_hash, ioopm_string_eq);
 
   elem_t key = string_elem("abc");
   elem_t value = int_elem(123);
@@ -133,7 +151,7 @@ void test_remove() {
 
 void test_has_key_empty(void) {
 
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_hash, ioopm_string_eq);
 
   CU_ASSERT_FALSE(ioopm_hash_table_has_key(ht, string_elem("key")));
 
@@ -142,7 +160,7 @@ void test_has_key_empty(void) {
 
 void test_has_key_insert(void) {
 
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_hash, ioopm_string_eq);
 
   ioopm_hash_table_insert(ht, string_elem("k"), int_elem(123));
 
@@ -154,7 +172,7 @@ void test_has_key_insert(void) {
 
 void test_has_multiple_keys(void) {
 
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_hash, ioopm_string_eq);
 
   ioopm_hash_table_insert(ht, string_elem("k1"), int_elem(1));
   ioopm_hash_table_insert(ht, string_elem("k2"), int_elem(2));
@@ -170,7 +188,7 @@ void test_has_multiple_keys(void) {
 
 void test_has_key_after_remove(void) {
 
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_hash, ioopm_string_eq);
 
   ioopm_hash_table_insert(ht, string_elem("k"), int_elem(123));
   ioopm_hash_table_remove(ht, string_elem("k"));
@@ -182,7 +200,7 @@ void test_has_key_after_remove(void) {
 
 void test_has_key_after_remove_middle(void) {
 
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_hash, ioopm_string_eq);
 
   ioopm_hash_table_insert(ht, string_elem("k1"), int_elem(1));
   ioopm_hash_table_insert(ht, string_elem("k2"), int_elem(2));
@@ -199,8 +217,7 @@ void test_has_key_after_remove_middle(void) {
 
 void test_remove_missing_key(void)
 {
-  ioopm_hash_table_t *ht =
-      ioopm_hash_table_create(ioopm_string_hash, ioopm_string_eq);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_hash, ioopm_string_eq);
 
   elem_t result = ioopm_hash_table_remove(ht, string_elem("missing"));
 
@@ -213,7 +230,7 @@ void test_remove_missing_key(void)
 
 void test_size_empty(void) {
 
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_hash, ioopm_string_eq);
 
   CU_ASSERT_EQUAL(ioopm_hash_table_size(ht), 0);
 
@@ -222,7 +239,7 @@ void test_size_empty(void) {
 
 void test_size_single(void) {
 
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_hash, ioopm_string_eq);
 
   ioopm_hash_table_insert(ht, string_elem("key"), int_elem(123));
 
@@ -233,7 +250,7 @@ void test_size_single(void) {
 
 void test_size_multiple(void) {
 
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_hash, ioopm_string_eq);
 
   ioopm_hash_table_insert(ht, string_elem("k1"), int_elem(1));
   ioopm_hash_table_insert(ht, string_elem("k2"), int_elem(2));
@@ -246,7 +263,7 @@ void test_size_multiple(void) {
 
 void test_size_after_remove(void) {
 
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_hash, ioopm_string_eq);
 
   ioopm_hash_table_insert(ht, string_elem("k1"), int_elem(1));
   ioopm_hash_table_insert(ht, string_elem("k2"), int_elem(2));
@@ -263,7 +280,7 @@ void test_size_after_remove(void) {
 void test_empty() {
 
   //gör först tom ht
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_hash, ioopm_string_eq);
   //gör iterator
   ioopm_hash_table_iterator_t *it = ioopm_hash_table_iterator_create(ht);
   //kolla att at_end blir true
@@ -275,7 +292,7 @@ void test_empty() {
 
 void test_one_entry() {
 
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_hash, ioopm_string_eq);
 
   ioopm_hash_table_insert(ht, string_elem("AAA"), int_elem(10));
 
@@ -286,7 +303,7 @@ void test_one_entry() {
   elem_t key = ioopm_hash_table_iterator_current_key(it);
   elem_t value = ioopm_hash_table_iterator_current_value(it);
 
-  CU_ASSERT_STRING_EQUAL(key.s, "AAA");
+  CU_ASSERT_EQUAL(key.s, "AAA");
   CU_ASSERT_EQUAL(value.i, 10);
 
   ioopm_hash_table_iterator_destroy(it);
@@ -298,7 +315,7 @@ void test_multiple_entries() {
   char *keys[3] = {"abc", "qwe", "asd"};
   int values[3] = {0, 1, 2};
 
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_hash, ioopm_string_eq);
 
   for (size_t i = 0; i < 3; ++i) {
     ioopm_hash_table_insert(ht,
@@ -323,7 +340,7 @@ void test_multiple_entries() {
 
 
 void test_every_entry_once() {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_hash, ioopm_string_eq);
 
   ioopm_hash_table_insert(ht, string_elem("abc"), int_elem(0));
   ioopm_hash_table_insert(ht, string_elem("qwe"), int_elem(1));
@@ -365,7 +382,7 @@ void test_every_entry_once() {
 
 void test_multiple_entries_same_bucket(void)
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_hash, string_eq);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_hash, ioopm_string_eq);
 
   char *keys[] = {
     "k0", "k1", "k2", "k3", "k4", "k5",
@@ -510,6 +527,23 @@ void test_insert_multiple_list(void)
   CU_ASSERT_EQUAL(ioopm_list_head(list).i, 11);
   CU_ASSERT_EQUAL(ioopm_list_get(list, 1).i, 22);
   CU_ASSERT_EQUAL(ioopm_list_get(list, 2).i, 33);
+
+  ioopm_list_destroy(list);
+}
+
+void test_insert_middle_list(void)
+{
+  ioopm_list_t *list = ioopm_list_create();
+
+  ioopm_list_append(list, int_elem(1));
+  ioopm_list_append(list, int_elem(3));
+
+  ioopm_list_insert(list, 1, int_elem(2));
+
+  CU_ASSERT_EQUAL(ioopm_list_size(list), 3);
+  CU_ASSERT_EQUAL(ioopm_list_get(list, 0).i, 1);
+  CU_ASSERT_EQUAL(ioopm_list_get(list, 1).i, 2);
+  CU_ASSERT_EQUAL(ioopm_list_get(list, 2).i, 3);
 
   ioopm_list_destroy(list);
 }
@@ -713,14 +747,21 @@ int main() {
   // the test in question. If you want to add another test, just
   // copy a line below and change the information
 if (
+  /// HASH TABLE TESTS
   (CU_add_test(ht_test, "Hash table insert once test", test_insert_once) == NULL) ||
   (CU_add_test(ht_test, "Key inserted twice with different values", test_insert_twice) == NULL) ||
+  (CU_add_test(ht_test, "Hash table collision test", test_hash_collision) == NULL) ||
+  (CU_add_test(ht_test, "Hash table is empty test", test_is_empty) == NULL) ||
+  (CU_add_test(ht_test, "Hash table is not empty test", test_is_not_empty) == NULL) ||
   (CU_add_test(ht_test, "Hash table remove test", test_remove) == NULL) ||
+  /// HAS KEY TESTS
   (CU_add_test(has_key_tests, "Has key empty test", test_has_key_empty) == NULL) ||
   (CU_add_test(has_key_tests, "Has key insert test", test_has_key_insert) == NULL) ||
   (CU_add_test(has_key_tests, "Has multiple keys test", test_has_multiple_keys) == NULL) ||
   (CU_add_test(has_key_tests, "Has key after remove test", test_has_key_after_remove) == NULL) ||
   (CU_add_test(has_key_tests, "Has key after removing middle key", test_has_key_after_remove_middle) == NULL) ||
+  (CU_add_test(ht_test, "Hash table remove missing key test", test_remove_missing_key) == NULL) ||
+  /// SIZE TESTS
   (CU_add_test(size_tests, "Size empty test", test_size_empty) == NULL) ||
   (CU_add_test(size_tests, "Size single test", test_size_single) == NULL) ||
   (CU_add_test(size_tests, "Size multiple test", test_size_multiple) == NULL) ||
@@ -729,22 +770,29 @@ if (
   (CU_add_test(iterator_tests, "Iterator one entry test", test_one_entry) == NULL) ||
   (CU_add_test(iterator_tests, "Iterator multiple entries", test_multiple_entries) == NULL) ||
   (CU_add_test(iterator_tests, "Iterator every entry once", test_every_entry_once) == NULL) ||
-
+  /// LIST TESTS
   (CU_add_test(list_tests, "Create and destroy list", test_create_destroy_list) == NULL) ||
+  /// APPEND AND PREPEND TESTS
   (CU_add_test(list_tests, "Append once", test_append_once_list) == NULL) ||
   (CU_add_test(list_tests, "Append multiple", test_append_multiple_list) == NULL) ||
   (CU_add_test(list_tests, "Prepend once", test_prepend_once_list) == NULL) ||
   (CU_add_test(list_tests, "Prepend multiple", test_prepend_multiple_list) == NULL) ||
-  (CU_add_test(list_tests, "Prepend and append multiple", test_prepend_append_multiple_list) == NULL) ||
-  (CU_add_test(list_tests, "Insert once", test_insert_once_list) == NULL) ||
-  (CU_add_test(list_tests, "Insert replace", test_insert_replace_list) == NULL) ||
-  (CU_add_test(list_tests, "Insert multiple", test_insert_multiple_list) == NULL) ||
+  (CU_add_test(list_tests, "Prepend and append multiple tests", test_prepend_append_multiple_list) == NULL) ||
+  /// INSERT LIST TESTS
+  (CU_add_test(list_tests, "Insert once tests", test_insert_once_list) == NULL) ||
+  (CU_add_test(list_tests, "Insert replace tests", test_insert_replace_list) == NULL) ||
+  (CU_add_test(list_tests, "Insert multiple test", test_insert_multiple_list) == NULL) ||
+  (CU_add_test(list_tests, "Insert middle test", test_insert_middle_list) == NULL) ||
+  /// REMOVE LIST TESTS
   (CU_add_test(list_tests, "Remove first", test_remove_first_list) == NULL) ||
   (CU_add_test(list_tests, "Remove multiple", test_remove_multiple_list) == NULL) ||
+  /// GET LIST TESTS
   (CU_add_test(list_tests, "Get multiple", test_list_get_multiple) == NULL) ||
   (CU_add_test(list_tests, "Get once", test_list_get_once) == NULL) ||
+  /// EMPTY LIST TESTS
   (CU_add_test(list_tests, "Empty list", test_empty_list) == NULL) ||
   (CU_add_test(list_tests, "Non-empty list", test_non_empty_list) == NULL) ||
+  /// LIST ITERATOR TESTS
   (CU_add_test(list_iterator_tests, "Iterator create", test_list_iterator_create) == NULL) ||
   (CU_add_test(list_iterator_tests, "Iterator end", test_list_iterator_end) == NULL) ||
   (CU_add_test(list_iterator_tests, "Iterator advance", test_list_iterator_advance) == NULL) ||

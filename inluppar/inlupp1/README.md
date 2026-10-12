@@ -84,48 +84,46 @@
 6. # TEST COVERAGE
 
     - Hash_table.c:
-        - Lines executed:100.00% of 75
-        - Branches executed:100.00% of 20
-        - Taken at least once:100.00% of 20
-
-    - List_iterator.c:
-        - Lines executed:100.00% of 18
-        - Branches executed:100.00% of 2
-        - Taken at least once:100.00% of 2
+        - Lines executed: 96.39% of 83
+        - Branches executed: 100.00% of 24
+        - Taken at least once: 100.00% of 24
+    
+    - Hash_table_iterator.c:
+        - Lines executed: 100.00% of 33
+        - Branches executed: 100.00% of 8
+        - Taken at least once: 100.00% of 8
 
     - Linked_list.c:
-        - Lines executed:97.80% of 91
-        - Branches executed:100.00% of 22
-        - Taken at least once:100.00% of 22
-
-    - Hash_table_iterator.c:
-        - Lines executed:100.00% of 33
-        - Branches executed:100.00% of 8
-        - Taken at least once:100.00% of 8
+        - Lines executed: 91.01% of 89
+        - Branches executed: 100.00% of 24
+        - Taken at least once: 87.50% of 24
+    
+    - List_iterator.c:
+        - Lines executed: 100.00% of 18
+        - Branches executed: 100.00% of 4
+        - Taken at least once: 75.00% of 4
 
 7. # Initial Profiling Results
     
-    The program was run with input files of different sizes. 
-    The code was profiled using Valgrind Callgrind, and the results were:
+    The program was profiled using Valgrind Callgrind, and the results were inspected using callgrind_annotate. The percentages represent individual instruction cost:
 
-    - 1k-long-words.txt:
-        1. ioopm_string_knr_hash – 7.91%
-        2. find_previous_entry – 0.54%
-        3. ioopm_string_eq – 0.24%
+    - 1k-words.txt containing 5k words:
+        1. string_to_hash - 16.60%
+        2. find_previous_entry - 10.35%
+        3. ioopm_string_eq - 2.93%
 
-    - 10k-words.txt:
-        1. find_previous_entry – 9.36%
-        2. ioopm_string_knr_hash – 5.64%
-        3. ioopm_string_eq – 5.39%
+    - 10k-words.txt containing 50k words:
+        1. string_to_hash - 17.00%
+        2. find_previous_entry - 10.60%
+        3. ioopm_string_eq - 3.00%
 
-    - 16k-words.txt:
-        1. find_previous_entry – 25.08%
-        2. ioopm_string_eq – 16.48%
-        3. ioopm_string_knr_hash – 1.42%
+    - 16k-words.txt containing 80k words:
+        1. string_to_hash - 17.02%
+        2. find_previous_entry - 10.61%
+        3. ioopm_string_eq - 3.00%
     
-    The results are not exactly the same for all inputs. As the input gets larger, find_previous_entry becomes a much larger part of the total number of references. ioopm_string_eq also becomes
-    more significant for the larger inputs.
+    The results are very similar across the the input files. With string_to_hash consistnently having the highest instruction cost, followed by find_previous_entry and lastly ioopm_string_eq.
+    
+    As the input size gets larger, the total number of instructions increases, while keeping the relative cost more or less the same. This suggests the costs scale proportionally with the amount of words needed to be scanned
 
-    This makes sense, and was somewhat expected, because a larger input causes the hash table to perform more searches and comparisons. 
-
-    Based on these results, find_previous_entry seems like a function to investigate for further optimization.
+    Based on these results, if optimization were needed, string_to_hash along with find_previous_entry are worth investigating.

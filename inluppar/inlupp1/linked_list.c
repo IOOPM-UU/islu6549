@@ -1,11 +1,9 @@
 #include <stdbool.h>
 #include <stdlib.h>
-#include <string.h>
 #include "linked_list.h"
 #include "linked_list_struct.h"
 #include "common.h"
 
-typedef struct list ioopm_list_t; /// Meta: struct definition goes in C file
 typedef struct node node_t;
 
 static node_t *node_create(elem_t value, node_t *next);
@@ -110,7 +108,7 @@ void ioopm_list_insert(ioopm_list_t *list, size_t index, elem_t value) {
 
 static node_t *node_create(elem_t value, node_t *next)
 {
-    // TODO: Stub
+    
     node_t *node = malloc(sizeof(node_t));
 
     node->value = value;
@@ -188,7 +186,18 @@ elem_t ioopm_list_get(ioopm_list_t *list, size_t index) {
 }
 
 /*
-// recursive version
+static elem_t list_get_recursive(node_t *node, size_t index)
+{
+    if (index != 0)
+    {
+        return list_get_recursive(node->next, index - 1);
+    }
+
+    return node->value;
+}
+*/
+/*
+// Tail recursive version
 static elem_t list_get_tail_recursive(node_t *node, size_t index)
 {
     if (index == 0)

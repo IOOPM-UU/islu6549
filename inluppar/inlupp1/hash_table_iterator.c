@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "hash_table_struct.h"
 #include "common.h"
-typedef struct hash_table_iterator ioopm_hash_table_iterator_t;
+#include "hash_table_iterator.h"
 
 struct hash_table_iterator
 {
@@ -12,10 +12,9 @@ struct hash_table_iterator
 
 ioopm_hash_table_iterator_t *ioopm_hash_table_iterator_create(ioopm_hash_table_t *ht);
 void ioopm_hash_table_iterator_destroy(ioopm_hash_table_iterator_t *hti);
-void iterator_state_advance(ioopm_hash_table_iterator_t *hti);
+static void iterator_state_advance(ioopm_hash_table_iterator_t *hti);
 void ioopm_hash_table_iterator_advance(ioopm_hash_table_iterator_t *it);
 static void skip_sentinel_nodes(ioopm_hash_table_iterator_t *hti);
-void ioopm_hash_table_iterator_advance(ioopm_hash_table_iterator_t *it);
 elem_t ioopm_hash_table_iterator_current_key(ioopm_hash_table_iterator_t *it);
 elem_t ioopm_hash_table_iterator_current_value(ioopm_hash_table_iterator_t *it);
 bool ioopm_hash_table_iterator_at_end(ioopm_hash_table_iterator_t *hti);
@@ -38,7 +37,7 @@ void ioopm_hash_table_iterator_destroy(ioopm_hash_table_iterator_t *hti) {
     free(hti);
 }
 
-void iterator_state_advance(ioopm_hash_table_iterator_t *hti)
+static void iterator_state_advance(ioopm_hash_table_iterator_t *hti)
 {
     // advance to the next entry in the bucket
     hti->current_entry = hti->current_entry->next;
@@ -46,7 +45,7 @@ void iterator_state_advance(ioopm_hash_table_iterator_t *hti)
     if (hti->current_entry == NULL) {
         hti->current_bucket += 1;
         // if the next bucket existed, update the current entry
-        if (hti->current_bucket != No_Buckets) {
+        if (hti->current_bucket != NO_BUCKETS) {
             hti->current_entry = &hti->ht->buckets[hti->current_bucket];
         }
     }
@@ -72,7 +71,7 @@ elem_t ioopm_hash_table_iterator_current_value(ioopm_hash_table_iterator_t *it) 
 
 static void skip_sentinel_nodes(ioopm_hash_table_iterator_t *hti) {
 
-    while (hti->current_bucket != No_Buckets &&     
+    while (hti->current_bucket != NO_BUCKETS &&     
            hti->current_entry == &hti->ht->buckets[hti->current_bucket]) {
 
         iterator_state_advance(hti);
@@ -81,5 +80,5 @@ static void skip_sentinel_nodes(ioopm_hash_table_iterator_t *hti) {
 
 bool ioopm_hash_table_iterator_at_end(ioopm_hash_table_iterator_t *hti) {
 
-    return hti->current_bucket == No_Buckets;
+    return hti->current_bucket == NO_BUCKETS;
 }
