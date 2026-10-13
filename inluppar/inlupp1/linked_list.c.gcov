@@ -16,50 +16,50 @@
         -:   12:
         -:   13:/// @brief Creates a new empty list
         -:   14:/// @return an empty linked list
-function ioopm_list_create called 19 returned 100% blocks executed 100%
-       19:   15:ioopm_list_t *ioopm_list_create(void) {
-       19:   16:    return calloc(1, sizeof(ioopm_list_t));
+function ioopm_list_create called 20 returned 100% blocks executed 100%
+       20:   15:ioopm_list_t *ioopm_list_create(void) {
+       20:   16:    return calloc(1, sizeof(ioopm_list_t));
         -:   17:}
         -:   18:
         -:   19:/// @brief Tear down the linked list and return all its memory (but not the memory of the elements)
         -:   20:/// @param list the list to be destroyed
-function ioopm_list_destroy called 19 returned 100% blocks executed 100%
-       19:   21:void ioopm_list_destroy(ioopm_list_t *list) {
-       19:   22:    node_t *previous = list->head;
+function ioopm_list_destroy called 20 returned 100% blocks executed 100%
+       20:   21:void ioopm_list_destroy(ioopm_list_t *list) {
+       20:   22:    node_t *previous = list->head;
         -:   23:
-       53:   24:    while (previous != NULL) {
-branch  0 taken 64%
-branch  1 taken 36% (fallthrough)
-       34:   25:        node_t *current = previous->next;
-       34:   26:        free(previous);
-       34:   27:        previous = current;
-       34:   28:        list->size--;
+       57:   24:    while (previous != NULL) {
+branch  0 taken 65%
+branch  1 taken 35% (fallthrough)
+       37:   25:        node_t *current = previous->next;
+       37:   26:        free(previous);
+       37:   27:        previous = current;
+       37:   28:        list->size--;
         -:   29:    }
         -:   30:
-       19:   31:    free(list);
-       19:   32:}
+       20:   31:    free(list);
+       20:   32:}
         -:   33:
         -:   34:/// @brief Insert at the end of a linked list in O(1) time
         -:   35:/// @param list the linked list that will be appended
         -:   36:/// @param value the value to be appended
-function ioopm_list_append called 26 returned 100% blocks executed 100%
-       26:   37:void ioopm_list_append(ioopm_list_t *list, elem_t value) {
-       26:   38:    node_t *old_tail = list->tail;
-       26:   39:    node_t *new_node = node_create(value, NULL);
+function ioopm_list_append called 28 returned 100% blocks executed 100%
+       28:   37:void ioopm_list_append(ioopm_list_t *list, elem_t value) {
+       28:   38:    node_t *old_tail = list->tail;
+       28:   39:    node_t *new_node = node_create(value, NULL);
 call    0 returned 100%
         -:   40:
-       26:   41:    list->size++;
+       28:   41:    list->size++;
         -:   42:
-       26:   43:    if(old_tail == NULL) {
-branch  0 taken 38% (fallthrough)
-branch  1 taken 62%
-       10:   44:        list->head = new_node;
-       10:   45:        list->tail = new_node;
+       28:   43:    if(old_tail == NULL) {
+branch  0 taken 39% (fallthrough)
+branch  1 taken 61%
+       11:   44:        list->head = new_node;
+       11:   45:        list->tail = new_node;
         -:   46:    } else {
-       16:   47:        list->tail->next = new_node;
-       16:   48:        list->tail = list->tail->next;
+       17:   47:        list->tail->next = new_node;
+       17:   48:        list->tail = list->tail->next;
         -:   49:    }
-       26:   50:}
+       28:   50:}
         -:   51:
         -:   52:/// @brief Insert at the front of a linked list in O(1) time
         -:   53:/// @param list the linked list that will be prepended to
@@ -102,50 +102,50 @@ function ioopm_list_last called 2 returned 100% blocks executed 100%
         -:   84:/// @param list the linked list that will be extended
         -:   85:/// @param index the position in the list
         -:   86:/// @param value the value to be inserted
-function ioopm_list_insert called 7 returned 100% blocks executed 58%
-        7:   87:void ioopm_list_insert(ioopm_list_t *list, size_t index, elem_t value) {
+function ioopm_list_insert called 8 returned 100% blocks executed 92%
+        8:   87:void ioopm_list_insert(ioopm_list_t *list, size_t index, elem_t value) {
         -:   88:    
-        7:   89:    if (index == 0) {
-branch  0 taken 57% (fallthrough)
-branch  1 taken 43%
+        8:   89:    if (index == 0) {
+branch  0 taken 50% (fallthrough)
+branch  1 taken 50%
         4:   90:        ioopm_list_prepend(list, value);
 call    0 returned 100%
         4:   91:        return;
-        3:   92:    } else if (index == list->size) {
-branch  0 taken 100% (fallthrough)
-branch  1 taken 0%
+        4:   92:    } else if (index == list->size) {
+branch  0 taken 75% (fallthrough)
+branch  1 taken 25%
         3:   93:        ioopm_list_append(list, value);
 call    0 returned 100%
         3:   94:        return;
         -:   95:    }
         -:   96:
-    #####:   97:    node_t *value_previous = list->head;
-    #####:   98:    node_t *value_next = value_previous->next;
+        1:   97:    node_t *value_previous = list->head;
+        1:   98:    node_t *value_next = value_previous->next;
         -:   99:
-    #####:  100:    for (size_t i = 0; i < index - 1; i++) {
-branch  0 never executed
-branch  1 never executed (fallthrough)
+       1*:  100:    for (size_t i = 0; i < index - 1; i++) {
+branch  0 taken 0%
+branch  1 taken 100% (fallthrough)
     #####:  101:        value_previous = value_previous->next;
     #####:  102:        value_next = value_previous->next;
         -:  103:    }
         -:  104:
-    #####:  105:    node_t *new_node = node_create(value, value_next);
-call    0 never executed
+        1:  105:    node_t *new_node = node_create(value, value_next);
+call    0 returned 100%
         -:  106:
-    #####:  107:    value_previous->next = new_node;
-    #####:  108:    list->size++;
+        1:  107:    value_previous->next = new_node;
+        1:  108:    list->size++;
         -:  109:}
         -:  110:
-function node_create called 37 returned 100% blocks executed 100%
-       37:  111:static node_t *node_create(elem_t value, node_t *next)
+function node_create called 40 returned 100% blocks executed 100%
+       40:  111:static node_t *node_create(elem_t value, node_t *next)
         -:  112:{
         -:  113:    // TODO: Stub
-       37:  114:    node_t *node = malloc(sizeof(node_t));
+       40:  114:    node_t *node = malloc(sizeof(node_t));
         -:  115:
-       37:  116:    node->value = value;
-       37:  117:    node->next = next;
+       40:  116:    node->value = value;
+       40:  117:    node->next = next;
         -:  118:
-       37:  119:    return node;
+       40:  119:    return node;
         -:  120:}
         -:  121:
         -:  122:/// @brief Remove an element from a linked list in O(n) time.
@@ -215,37 +215,66 @@ branch  1 taken 0%
         -:  177:/// @param list the linked list that will be extended
         -:  178:/// @param index the position in the list
         -:  179:/// @return the value at the given position
-function ioopm_list_get called 14 returned 100% blocks executed 100%
-       14:  180:elem_t ioopm_list_get(ioopm_list_t *list, size_t index) {
-       14:  181:    node_t *current_value = list->head; 
+function ioopm_list_get called 17 returned 100% blocks executed 100%
+       17:  180:elem_t ioopm_list_get(ioopm_list_t *list, size_t index) {
+       17:  181:    node_t *current_value = list->head; 
         -:  182:
-       32:  183:    for (size_t i = 0; i < index; i++) {
-branch  0 taken 56%
-branch  1 taken 44% (fallthrough)
-       18:  184:        current_value = current_value->next;
+       38:  183:    for (size_t i = 0; i < index; i++) {
+branch  0 taken 55%
+branch  1 taken 45% (fallthrough)
+       21:  184:        current_value = current_value->next;
         -:  185:    }
         -:  186:
-       14:  187:    return current_value->value;
+       17:  187:    return current_value->value;
         -:  188:}
         -:  189:
-        -:  190:/// @brief Lookup the number of elements in the linked list in O(1) time
-        -:  191:/// @param list the linked list
-        -:  192:/// @return the number of elements in the list
-function ioopm_list_size called 0 returned 0% blocks executed 0%
-    #####:  193:size_t ioopm_list_size(ioopm_list_t *list) {
-    #####:  194:    return list->size;
-        -:  195:}
-        -:  196:
-        -:  197:/// @brief Test whether a list is empty or not
-        -:  198:/// @param list the linked list
-        -:  199:/// @return true if the number of elements int the list is 0, else false
+        -:  190:/*
+        -:  191:static elem_t list_get_recursive(node_t *node, size_t index)
+        -:  192:{
+        -:  193:    if (index != 0)
+        -:  194:    {
+        -:  195:        return list_get_recursive(node->next, index - 1);
+        -:  196:    }
+        -:  197:
+        -:  198:    return node->value;
+        -:  199:}
+        -:  200:*/
+        -:  201:/*
+        -:  202:// Tail recursive version
+        -:  203:static elem_t list_get_tail_recursive(node_t *node, size_t index)
+        -:  204:{
+        -:  205:    if (index == 0)
+        -:  206:    {
+        -:  207:        return node->value;
+        -:  208:    }
+        -:  209:
+        -:  210:    return list_get_tail_recursive(node->next, index - 1);
+        -:  211:}
+        -:  212:
+        -:  213:elem_t ioopm_list_get_tail_recursive(ioopm_list_t *list, size_t index)
+        -:  214:{
+        -:  215:    return list_get_tail_recursive(list->head, index);
+        -:  216:}
+        -:  217:*/
+        -:  218:
+        -:  219:/// @brief Lookup the number of elements in the linked list in O(1) time
+        -:  220:/// @param list the linked list
+        -:  221:/// @return the number of elements in the list
+function ioopm_list_size called 1 returned 100% blocks executed 100%
+        1:  222:size_t ioopm_list_size(ioopm_list_t *list) {
+        1:  223:    return list->size;
+        -:  224:}
+        -:  225:
+        -:  226:/// @brief Test whether a list is empty or not
+        -:  227:/// @param list the linked list
+        -:  228:/// @return true if the number of elements int the list is 0, else false
 function ioopm_list_is_empty called 2 returned 100% blocks executed 100%
-        2:  200:bool ioopm_list_is_empty(ioopm_list_t *list) {
-        2:  201:    if (list->head == NULL) {
+        2:  229:bool ioopm_list_is_empty(ioopm_list_t *list) {
+        2:  230:    if (list->head == NULL) {
 branch  0 taken 50% (fallthrough)
 branch  1 taken 50%
-        1:  202:        return true;
-        -:  203:    } else {
-        1:  204:        return false;
-        -:  205:    }
-        -:  206:}
+        1:  231:        return true;
+        -:  232:    } else {
+        1:  233:        return false;
+        -:  234:    }
+        -:  235:}
