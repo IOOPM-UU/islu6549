@@ -1,0 +1,128 @@
+1. # Make Targets
+    - Build the webstore: make
+    - Run unit tests: make test
+    - Run unit_tests through Valgrind: make valgrind
+    - Coverage with gcov: make coverage
+    - Clean files: make clean
+
+2. # Merchandise (Hash Table)
+
+    - CREATING THE HASH TABLE
+        - The hash table is a fixed size array of NO_BUCKETS (50) merchandise structs, stored directly in the table.
+            - A bucket is empty if its name is NULL.
+            - A merchandise struct consists of a name, a description, a price and a linked list of shelves (locs).
+        - ioopm_hash_table_init(ht) empties every bucket and initializes the hash function (string_hash) and the key comparison function (string_eq).
+        - Collisions are handled with linear probing: if the bucket is taken, the next one is tried.
+        - The store can hold at most 50 different merchandise, but can be changed if NO_BUCKET is changed.
+        - The hash value is only used to decide where a merchandise is placed. Looking a merchandise up (find_merch) checks every bucket with strcmp.
+
+    - DOCUMENTATION
+        - All store functions are documented in UI_Func.h
+        - The menu and the event loop are documented in webstore.h
+
+    - MEMORY USAGE
+        - ioopm_merch_add takes ownership of name and description, so they have to be heap allocated. The table frees them in merch_remove.
+        - If ioopm_merch_add does not add anything (duplicate name, negative price or full store) it frees name and description itself.
+        - merch_edit copies the new name and description with malloc(), so the caller still has to free its strings.
+        - ioopm_program_exit removes every merchandise and every cart before the program ends.
+
+    - ERROR HANDLING
+        - Adding a merchandise that already exists, has a negative price or does not fit in the table prints a message and changes nothing. Hence it uses special case handling.
+        - Removing, editing, showing stock for or replenishing a merchandise that does not exist prints a message.
+        - Editing to a name that is already taken or to a negative price prints a message and changes nothing.
+        - Memory allocation failures are handled in merch_edit and in the cart functions, but not in ioopm_stock_replenish.
+
+
+3. # Shelves (Linked Lists)
+
+    - CREATING THE SHELVES
+        - The shelves of a merchandise are stored in a linked list (ioopm_list_t) consisting of its first and last node, as well as its size.
+            - A node consists of a pointer to a shelf and a pointer to the next node.
+            - A shelf consists of an aisle (for example A25) and a quantity.
+        - The list is created the first time a merchandise is replenished, so locs is NULL for merchandise without stock.
+        - Replenishing an aisle that already holds the merchandise adds to its quantity, otherwise a new shelf is added last in the list.
+        - A shelf can only hold one kind of merchandise (checked by shelf_taken).
+
+    - DOCUMENTATION
+        - ioopm_stock_show and ioopm_stock_replenish are documented in UI_Func.h
+        - The structs are documented in data_structure.h
+
+    - MEMORY USAGE
+        - Shelves, their aisle strings, their nodes and the list are created using malloc() in ioopm_stock_replenish.
+        - They are freed one by one in merch_remove.
+        - ioopm_stock_show creates a temporary array with malloc() to sort the shelves by aisle and frees it before it returns.
+
+    - ERROR HANDLING
+        - Replenishing with an amount of 0 or less prints a message and changes nothing.
+        - Replenishing an aisle that is used by another merchandise prints a message and changes nothing.
+
+
+4. # Shopping Carts
+
+    - CREATING A CART
+        - Carts are stored in a linked list. The head of the list is a static variable in UI_Func.c.
+            - A cart consists of its id, a pointer to the next cart and the first and last item of the cart.
+            - An item consists of the name of the merchandise, a quantity and a pointer to the next item.
+        - ioopm_cart_create gives the cart the next free id (starting at 0) and prints it.
+        - Items store the name of the merchandise and not a pointer to it, so merch_edit renames the item in every cart when a merchandise gets a new name.
+
+    - RESERVING STOCK
+        - A cart reserves stock. The total quantity of one merchandise over all carts can not be more than its total stock (total_in_carts and total_stock).
+        - Adding a merchandise that is already in the cart increases its quantity.
+        - Removing the whole quantity of an item removes it from the cart.
+
+    - COST AND CHECKOUT
+        - ioopm_calculate_cost multiplies price and quantity for every item. Merchandise that has been removed from the store is reported and not counted.
+        - ioopm_checkout first checks that every item exists and that there is enough stock. If something is wrong, nothing is bought and the cart is kept.
+        - If everything is fine the stock is reduced shelf by shelf (the first shelf is emptied first) and the cart is removed.
+
+    - MEMORY USAGE
+        - Carts and items are created using malloc(), and the name of the merchandise in an item is a copy made with malloc().
+        - ioopm_cart_remove frees every item in the cart and then the cart.
+
+    - ERROR HANDLING
+        - Using a cart id that does not exist prints a message.
+        - Adding or removing a quantity of 0 or less prints a message.
+        - Removing more than the cart contains, or something that is not in the cart, prints a message.
+
+
+5. # Reading Input
+
+    - DOCUMENTATION
+        - All functions are declared in string_utils.h
+
+    - HOW IT WORKS
+        - ask_question_int, ask_question_float, ask_question_string, ask_question_line and ask_question_shelf repeat the question until the answer has the right format.
+        - ask_question_menu (webstore.c) only accepts one of the characters in the menu.
+        - Names and descriptions are read with ask_question_line, which keeps spaces and skips empty lines.
+
+    - ERROR HANDLING
+        - If the input ends (EOF) the functions stop asking and return 0 or an empty string. ask_question_menu then returns 'Q', so the program quits instead of looping forever.
+        - Answers are read with a maximum width of 254 characters.
+
+
+6. # TEST COVERAGE
+
+    - HOW TO SEE IT
+        - make coverage runs the unit tests and creates gcov files.
+        - The summary for each file is printed in the terminal.
+        - The files UI_Func.c.gcov, string_utils.c.gcov and webstore.c.gcov show every line of the code with the number of times it was run. Lines that were never run are marked with #####.
+
+    - UI_Func.c:
+        - Lines executed: 94.72% of 417
+        - Branches executed: 100.00% of 226
+        - Taken at least once: 96.02% of 226
+
+    - webstore.c:
+        - Lines executed: 92.55% of 94
+        - Branches executed: 100.00% of 21
+        - Taken at least once: 95.24% of 21
+
+    - NOT COVERED
+        - The messages printed when malloc() fails.
+        - ioopm_program_undo and ioopm_file_persistance, which are not implemented.
+        - The default case in event_loop (its unreachable) and main.
+
+    - HOW THE TESTS WORK
+        - The functions print their results, so the tests catch stdout, and read input from a string instead of the keyboard.
+        - event_loop and ioopm_program_exit end the program, so they are run in a child process.

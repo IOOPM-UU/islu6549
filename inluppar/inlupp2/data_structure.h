@@ -1,5 +1,11 @@
 #pragma once
 
+/**
+ * @file data_structure.h
+ * @brief Contains structs for hash tables and their nodes, as well as linked lists and their nodes.
+ *
+ */
+
 #include "common.h"
 
 #define NO_BUCKETS 50

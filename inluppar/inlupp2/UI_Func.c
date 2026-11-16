@@ -75,6 +75,14 @@ void ioopm_hash_table_init(ioopm_hash_table_t *ht) {
 }
 
 void ioopm_merch_add(ioopm_hash_table_t *ht, char *name, char* description, int price, ioopm_list_t *locs) {
+    
+    if (price < 0) {
+        printf("Price can not be negative\n");
+        free(name);
+        free(description);
+        return;
+    }
+
     for (int i = 0; i < NO_BUCKETS; i++) {
         if(ht->buckets[i].name != NULL && strcmp(ht->buckets[i].name, name) == 0) {
 
@@ -89,7 +97,7 @@ void ioopm_merch_add(ioopm_hash_table_t *ht, char *name, char* description, int 
 
     size_t tries = 0;
 
-    while (ht->buckets[bucket].name != NULL) {
+    while (ht->buckets[bucket].name != NULL && tries < NO_BUCKETS) {
         bucket = (bucket + 1) % NO_BUCKETS;
         tries++;
     }
@@ -250,7 +258,7 @@ void merch_display(ioopm_hash_table_t *ht) {
         if (shown < n) {
             printf("Do you want to continue? (Y/N): ");
 
-            char answer;
+            char answer= 'N';
             scanf(" %c", &answer);
 
             if (toupper((unsigned char)answer) != 'Y') {
@@ -366,6 +374,16 @@ void ioopm_stock_replenish(ioopm_hash_table_t *ht, char *name, char *aisle, int 
 
     if (merch == NULL) {
         printf("%s does not exist\n", name);
+        return;
+    }
+
+    if (amount <= 0) {
+        printf("Amount must be at least 1\n");
+        return;
+    }
+
+    if (shelf_taken(ht, merch, aisle)) {
+        printf("Shelf %s is already used by another merchandise\n", aisle);
         return;
     }
 

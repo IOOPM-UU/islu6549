@@ -23,6 +23,11 @@ char ask_question_menu(char *question) {
     answer_t answer = ask_question(question, correct_type, string_to_answer_t);
     char choice = toupper((unsigned char)answer.string_value[0]);
     free(answer.string_value);
+
+    if (choice == '\0') {
+        choice = 'Q'; // input ended, quit instead of looping forever
+    }
+
     return choice;
 }
 
@@ -112,9 +117,14 @@ void event_loop(ioopm_hash_table_t *ht) {
             break;
         }
         
-        case 'R':
-            // Remove
+        case 'R': {
+            // Remove cart
+            int cart_id = ask_question_int("Cart id:");
+
+            ioopm_cart_remove(cart_id);
+            
             break;
+        }
         
         case '+': {
             // Add to cart
@@ -138,13 +148,21 @@ void event_loop(ioopm_hash_table_t *ht) {
             break;
         }
         
-        case '=':
+        case '=': {
             // Calculate cost
+            int cart_id = ask_question_int("Cart id: ");
+
+            ioopm_calculate_cost(ht, cart_id);
             break;
+        }
         
-        case 'O':
+        case 'O': {
             // Checkout
+            int cart_id = ask_question_int("Cart id: ");
+
+            ioopm_checkout(ht, cart_id);
             break;
+        }
         
         case 'U':
             // Undo

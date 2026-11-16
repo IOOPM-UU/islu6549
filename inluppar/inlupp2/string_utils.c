@@ -32,10 +32,14 @@ void cool_println(char *str) {
 
 answer_t ask_question(char *question, check_func *right_format, convert_func *convert) {
 
-    char result[255]; // <-- bufferstorlek 255
+    char result[255]; // bufferstorlek
     do {
         printf("%s\n", question);
-        scanf("%254s", result); // <-- scanf vet ej bufferstorlek! (inläsning av >254 tecken möjligt!)
+
+        if (scanf("%254s", result) == EOF) {
+            result[0] = '\0';
+            break;
+        }
 
         if (!right_format(result)) {
             result[0] = '\0';
@@ -59,9 +63,8 @@ int ask_question_int(char *question) {
             c = getchar();
             }
         while (c != '\n' && c != EOF);
-        //putchar('\n');
         }
-    while (conversions < 1);
+    while (conversions < 1 && conversions != EOF);
     
     return result;
 }
@@ -69,15 +72,25 @@ int ask_question_int(char *question) {
 
 bool is_float(char *str) {
     int i = 0;
-    while (str[i] != '\0') {
-        if (isalpha(str[i]) && str[i] != '.') {
-            return false;
-        } else {
-            i++;
-        }
+    int digits = 0;
+    int dots = 0;
+
+    if (str[i] == '-' || str[i] == '+') {
+        i++;
     }
 
-    return true;
+    while (str[i] != '\0') {
+        if (isdigit((unsigned char)str[i])) {
+            digits++;
+        } else if (str[i] == '.' && dots == 0) {
+            dots++;
+        } else {
+            return false;
+        }
+        i++;
+    }
+
+    return digits > 0;
 }
 
 answer_t convert_to_answer_t_float(char *str) {
@@ -91,10 +104,13 @@ float ask_question_float(char *question) {
 
 char *ask_question_string(char *question) {
 
-    char result[255]; // <-- bufferstorlek 255
+    char result[255]; // bufferstorlek
     do {
         printf("%s\n", question);
-        scanf("%254s", result); // <-- scanf vet ej bufferstorlek! (inläsning av >254 tecken möjligt!)
+
+        if (scanf("%254s", result) == EOF) {
+            break;
+        }
     }
     while (strlen(result) == 0);
     return strdup(result);
@@ -106,9 +122,12 @@ char *ask_question_line(char *question) {
     printf("%s\n", question);
 
     do {
-        fgets(result, sizeof(result), stdin);
-        result[strcspn(result, "\n")] = '\0';   // cut off the newline
-    } while (strlen(result) == 0);              // skip empty lines
+        if (fgets(result, sizeof(result), stdin) == NULL) {
+            result[0] = '\0';
+            break;
+        }
+        result[strcspn(result, "\n")] = '\0';
+    } while (strlen(result) == 0);
 
     return strdup(result);
 }
@@ -143,7 +162,9 @@ char *ask_question_shelf(char *question) {
 
 
 int read_string(char *buf, int buf_size) {
-    scanf("%s", buf);
+    char format[16];
+    snprintf(format, sizeof(format), "%%%ds", buf_size - 1);
+    scanf(format, buf);
 
     int count = 0;
     for (count = 0; count < buf_size; count++) {
@@ -156,4 +177,3 @@ int read_string(char *buf, int buf_size) {
 
     return count;
 }
-
